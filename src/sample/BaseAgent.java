@@ -4,8 +4,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
 public class BaseAgent {
-float x=92;
-float y=50;
+double x=92;
+double y=50;
 float targetX;
 float targetY;
 float targetDirection;
@@ -15,10 +15,10 @@ Canvas canvas;
 double direction;
 double scale =1;
 Space2D space2D;
-MovementState movementState;
+MovementState movementState = MovementState.STILL;
 
-static double nominalSpeed = 2; //px per iteration
-    static double nominalAngularSpeed = 3*Math.PI/180; //rad per iteration
+static double nominalSpeed = 3; //px per iteration
+    static double nominalAngularSpeed = 6*Math.PI/180; //rad per iteration
 
 BaseAgent(Space2D space2D){
     this.space2D = space2D;
@@ -28,9 +28,14 @@ void turn(double rad){
     direction+=rad;
 }
 void moveForward(int dist){
-    x+=dist*Math.cos(direction);
-    y+=dist*Math.sin(direction);
+  double xNew = x + dist*Math.cos(direction);
+  double yNew = y + dist*Math.sin(direction);
 
+  if(xNew-radius<0||xNew+radius>space2D.width||yNew-radius<0||yNew+radius>space2D.height){//hitted boundry of space, bounce back
+      direction = direction+Math.PI;
+  }
+x=xNew;
+y=yNew;
 }
 //    void moveForwardOneTick(double speed){
 //        x+=dist*Math.cos(direction);
@@ -40,7 +45,7 @@ void moveForward(int dist){
 
 void movementStep(){
   if(movementState.equals(MovementState.FORWARD)){
-      moveForward((int)nominalAngularSpeed);
+      moveForward((int)nominalSpeed);
   }else if(movementState.equals(MovementState.TURNING_LEFT)){
       turn(-nominalAngularSpeed);
   }else if(movementState.equals(MovementState.TURNING_RIGHT)){

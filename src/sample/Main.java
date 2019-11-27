@@ -17,9 +17,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-
-    Space2D board;
+    Space2D board = new Space2D(400, 300);
     BaseAgent testAgent;
+    Simulation simulation = new Simulation(board);
+
 static Canvas canvas = new Canvas(2500, 2500);
 
     @Override
@@ -27,9 +28,9 @@ static Canvas canvas = new Canvas(2500, 2500);
         // Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         ScrollPane scrollPane = new ScrollPane(canvas);
         BorderPane root = new BorderPane(scrollPane);
-        board = new Space2D(400, 300);
         board.draw(canvas);
         testAgent = new BaseAgent(board);
+        simulation.agents.add(testAgent);
         // PASimulator simulator = new PASimulator(board);
         // PolicyIterator policyIterator = new PolicyIterator(board);
         Button obstButton = new Button("Set Obstacle");
@@ -37,6 +38,8 @@ static Canvas canvas = new Canvas(2500, 2500);
         Button startPositionButton = new Button("Set Start Position");
         Button iterationButton = new Button("Run PI Algorithm");
         Button makeMoveButton = new Button("Move");
+        Button stopMoveButton = new Button("Stop");
+
         obstButton.setPrefWidth(130);
         terminalPositionButton.setPrefWidth(130);
         startPositionButton.setPrefWidth(130);
@@ -52,7 +55,7 @@ static Canvas canvas = new Canvas(2500, 2500);
         Button turnLeftButton = new Button("<<");
 
         HBox adjustmentPanel = new HBox(5, xPlus, xMinus, yPlus, yMinus);
-        HBox robotControlPanel = new HBox(turnLeftButton, makeMoveButton, turnRightButton);
+        HBox robotControlPanel = new HBox(turnLeftButton, makeMoveButton,stopMoveButton, turnRightButton);
         xPlus.setOnAction(event -> {
             board.setWidth(board.width + 1);
             redrawBoard();
@@ -71,17 +74,14 @@ static Canvas canvas = new Canvas(2500, 2500);
         });
 
         turnLeftButton.setOnAction(event -> {
-testAgent.turn(-10*Math.PI/180);
-       board.draw();
-       testAgent.draw();
+            testAgent.movementState=MovementState.TURNING_LEFT;
         });
         turnRightButton.setOnAction(event -> {
-            testAgent.turn(10*Math.PI/180);
-            board.draw();
-            testAgent.draw();
-
+            testAgent.movementState=MovementState.TURNING_RIGHT;
         });
-
+stopMoveButton.setOnAction(event -> {
+    testAgent.movementState=MovementState.STILL;
+});
         canvas.setOnMouseClicked(event -> {
             board.selectCell(event.getX(), event.getY());
             if (board.selectedCell != null)
@@ -105,9 +105,7 @@ testAgent.turn(-10*Math.PI/180);
 
         });
         makeMoveButton.setOnAction(event -> {
-testAgent.moveForward(30);
-            board.draw();
-            testAgent.draw();
+testAgent.movementState = MovementState.FORWARD;
 
         });
         obstButton.setOnAction(event -> {

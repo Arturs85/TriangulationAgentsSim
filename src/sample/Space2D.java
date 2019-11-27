@@ -48,7 +48,8 @@ public class Space2D {
         //background
         GraphicsContext g = canvas.getGraphicsContext2D();
         g.setFill(Color.WHITE);  // fill with white background
-        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        g.fillRect(0+cellsOffset, 0+cellsOffset, canvas.getWidth(), canvas.getHeight());
+        g.strokeRect(0+cellsOffset, 0+cellsOffset, canvas.getWidth(), canvas.getHeight());
         // draw cells
 
     }

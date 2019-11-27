@@ -3,7 +3,10 @@ package sample;
 import jade.core.AID;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +14,8 @@ import java.util.List;
 public class Simulation {
     public Controller controller;
     static int agentNumber = 0;
-    int simStepDefDuration = 1000;
+    int simStepDefDuration = 50;
+    Space2D board;
     int simTimeFactor = 1;
     Timeline timeline;
     int simTime = 0;
@@ -27,12 +31,21 @@ public class Simulation {
 
 public List<BaseAgent> agents=new ArrayList<>(10);
 
+    Simulation(Space2D board){
+        this.board=board;
+        timeline = new Timeline(new KeyFrame(Duration.millis(simStepDefDuration), ae -> simulationStep()));
+        timeline.setCycleCount(Animation.INDEFINITE);
+    timeline.play();
+    }
 
     synchronized void simulationStep() {
         simTime++;
-
+        board.draw();
+        for (BaseAgent a : agents) {
+            a.movementStep();
+        a.draw();
+        }
     }
-
 
 
 
