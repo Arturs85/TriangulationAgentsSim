@@ -14,13 +14,16 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
     Space2D board = new Space2D(400, 300);
     BaseAgent testAgent;
     Simulation simulation = new Simulation(board);
-
+boolean obstDrawingStarted = false;
+double firstX;
+double firstY;
 static Canvas canvas = new Canvas(2500, 2500);
 
     @Override
@@ -83,13 +86,15 @@ stopMoveButton.setOnAction(event -> {
     testAgent.movementState=MovementState.STILL;
 });
         canvas.setOnMouseClicked(event -> {
-            board.selectCell(event.getX(), event.getY());
-            if (board.selectedCell != null)
-                redrawObstButton(obstButton, board.selectedCell.isObstacle);
-            //System.out.println(event.getX() + "  " + event.getY());
-            // if (simulator != null)
-            ///     simulator.draw();
-            //else
+          if(!obstDrawingStarted) {
+          firstX= event.getX();
+          firstY = event.getY();
+              obstDrawingStarted=true;
+                    }
+                    else{
+              board.obstacles.add(new Rectangle(firstX,firstY,event.getX()-firstX,event.getY()-firstY));
+              obstDrawingStarted=false;
+          }
             board.draw();
         });
 

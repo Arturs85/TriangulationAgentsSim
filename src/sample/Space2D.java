@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Space2D {
 
     MapCell selectedCell;
-    ArrayList<Rectangle> obstacles;
+    ArrayList<javafx.scene.shape.Rectangle> obstacles;
     int width;
     int height;
     int maxSize = 100;
@@ -48,10 +48,14 @@ public class Space2D {
         //background
         GraphicsContext g = canvas.getGraphicsContext2D();
         g.setFill(Color.WHITE);  // fill with white background
-        g.fillRect(0+cellsOffset, 0+cellsOffset, canvas.getWidth(), canvas.getHeight());
-        g.strokeRect(0+cellsOffset, 0+cellsOffset, canvas.getWidth(), canvas.getHeight());
-        // draw cells
+        g.fillRect(0+cellsOffset, 0+cellsOffset,width, height);
+        g.strokeRect(0+cellsOffset, 0+cellsOffset, width, height);
+        // draw obst
+        g.setFill(Color.GRAY);  // fill with white background
 
+        for (javafx.scene.shape.Rectangle r:obstacles) {
+            g.fillRect(r.getX(),r.getY(),r.getWidth(),r.getHeight());
+        }
     }
 
     void unselectMapCells() {

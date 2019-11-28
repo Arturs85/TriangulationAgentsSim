@@ -2,6 +2,7 @@ package sample;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.shape.Rectangle;
 
 public class BaseAgent {
 double x=92;
@@ -31,8 +32,9 @@ void moveForward(int dist){
   double xNew = x + dist*Math.cos(direction);
   double yNew = y + dist*Math.sin(direction);
 
-  if(xNew-radius<0||xNew+radius>space2D.width||yNew-radius<0||yNew+radius>space2D.height){//hitted boundry of space, bounce back
+  if((xNew-radius<0||xNew+radius>space2D.width||yNew-radius<0||yNew+radius>space2D.height)||hasHitObstacle(xNew,yNew)){//hitted boundry of space, bounce back
       direction = direction+Math.PI;
+
   }
 x=xNew;
 y=yNew;
@@ -60,5 +62,13 @@ g.strokeOval(Space2D.cellsOffset+(x-radius)*scale,Space2D.cellsOffset+(y-radius)
 g.strokeLine(Space2D.cellsOffset+x*scale,Space2D.cellsOffset+y*scale,Space2D.cellsOffset+scale* (x+radius*Math.cos(direction)),Space2D.cellsOffset+scale* (y+radius*Math.sin(direction)));
 }
 
+boolean hasHitObstacle(double x, double  y){
+    for (Rectangle r:space2D.obstacles) {
+        if(x+radius>r.getX()&&x-radius<(r.getX()+r.getWidth())&&y+radius>r.getY()&&y-radius<(r.getY()+r.getHeight())){//hitted boundry of space, bounce back
+return true;
+        }
+    }
+return false;
+    }
 
 }
