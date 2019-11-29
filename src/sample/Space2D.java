@@ -1,6 +1,5 @@
 package sample;
 
-import com.sun.javafx.geom.Rectangle;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -54,7 +53,7 @@ public class Space2D {
         g.setFill(Color.GRAY);  // fill with white background
 
         for (javafx.scene.shape.Rectangle r:obstacles) {
-            g.fillRect(r.getX(),r.getY(),r.getWidth(),r.getHeight());
+            g.fillRect(r.getX()* PublicPartOfAgent.scale+cellsOffset,r.getY()+cellsOffset,r.getWidth(),r.getHeight());
         }
     }
 

@@ -1,10 +1,8 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -19,7 +17,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     Space2D board = new Space2D(400, 300);
-    BaseAgent testAgent;
+    PublicPartOfAgent testAgent;
     Simulation simulation = new Simulation(board);
 boolean obstDrawingStarted = false;
 double firstX;
@@ -32,7 +30,7 @@ static Canvas canvas = new Canvas(2500, 2500);
         ScrollPane scrollPane = new ScrollPane(canvas);
         BorderPane root = new BorderPane(scrollPane);
         board.draw(canvas);
-        testAgent = new BaseAgent(board);
+        testAgent = new PublicPartOfAgent(board, simulation);
         simulation.agents.add(testAgent);
         // PASimulator simulator = new PASimulator(board);
         // PolicyIterator policyIterator = new PolicyIterator(board);
@@ -87,12 +85,12 @@ stopMoveButton.setOnAction(event -> {
 });
         canvas.setOnMouseClicked(event -> {
           if(!obstDrawingStarted) {
-          firstX= event.getX();
-          firstY = event.getY();
+          firstX = event.getX()-Space2D.cellsOffset;
+          firstY = event.getY()-Space2D.cellsOffset;
               obstDrawingStarted=true;
                     }
                     else{
-              board.obstacles.add(new Rectangle(firstX,firstY,event.getX()-firstX,event.getY()-firstY));
+              board.obstacles.add(new Rectangle(firstX,firstY,event.getX()-Space2D.cellsOffset-firstX,event.getY()-Space2D.cellsOffset-firstY));
               obstDrawingStarted=false;
           }
             board.draw();
