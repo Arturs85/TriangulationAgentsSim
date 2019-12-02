@@ -11,7 +11,7 @@ public class TwoPointFormationRequest extends OneShotBehaviour {
     BaseUWBAgent owner;
     public static String testConvId = "testId";
     static final int replyTimeout = 5000;//ms
-
+static final double triangleTravelside =50;//px
     TwoPointFormationRequest(BaseUWBAgent owner) {
         this.owner = owner;
     }
@@ -26,7 +26,7 @@ public class TwoPointFormationRequest extends OneShotBehaviour {
      *
      * @param ppa
      */
-    void sendInvite(PublicPartOfAgent ppa) {
+    void sendInvite(PublicPartOfAgent ppa) throws Exception {
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.setConversationId(testConvId);
         msg.addReceiver(new AID(ppa.agentName, true));
@@ -38,6 +38,13 @@ public class TwoPointFormationRequest extends OneShotBehaviour {
             if (receivePositiveReply()) {
                 // carry on with protocol
                 System.out.println("Confirmation received");
+double distance1 = owner.publicPartOfAgent.measureDistance(ppa.agentName);//no use to call measureDistance by name- could be called directly by ppa
+       // now make stright movement in some direction
+owner.publicPartOfAgent.moveForwardBy(triangleTravelside);
+
+double distance2 = owner.publicPartOfAgent.measureDistance(ppa.agentName);//no use to call measureDistance by name- could be called directly by ppa
+
+                double relativeAngle = owner.publicPartOfAgent.calculateRelativeAngle(distance1, distance2, triangleTravelside);
 
             }
             try {
