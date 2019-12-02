@@ -28,7 +28,7 @@ public class Simulation {
 List<PublicPartOfAgent> publicPartsOfAgents = new ArrayList<>();
 
 
-public List<PublicPartOfAgent> agents=new ArrayList<>(10);
+//public List<PublicPartOfAgent> agents=new ArrayList<>(10);
 
     Simulation(Space2D board){
         this.board=board;
@@ -41,7 +41,7 @@ public List<PublicPartOfAgent> agents=new ArrayList<>(10);
     synchronized void simulationStep() {
         simTime++;
         board.draw();
-        for (PublicPartOfAgent a : agents) {
+        for (PublicPartOfAgent a : publicPartsOfAgents) {
             a.movementStep();
         a.draw();
         }
@@ -68,7 +68,19 @@ public List<PublicPartOfAgent> agents=new ArrayList<>(10);
         return cc;
     }
 
-    void createAgent(PublicPartOfAgent publicPartOfAgent) {
+    /**
+     * use to create new agents and get their public parts to acces their data
+     * @return  public part of agent
+     */
+    PublicPartOfAgent createAgent(){
+        PublicPartOfAgent ppa = new PublicPartOfAgent(board,this);
+
+        if(createAgent(ppa))
+            return ppa;
+        else
+            return null;
+    }
+   private boolean createAgent(PublicPartOfAgent publicPartOfAgent) {
         if (cc != null) {
             Object reference = new Object();
             Object args[] = {publicPartOfAgent};
@@ -79,9 +91,12 @@ public List<PublicPartOfAgent> agents=new ArrayList<>(10);
                 dummy.start();
             } catch (Exception e) {
                 e.printStackTrace();
+            return false;
             }
 publicPartsOfAgents.add(publicPartOfAgent);
+        return true;
         }
+    return false;
     }
 
     void createGUIAgent() {

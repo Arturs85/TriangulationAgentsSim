@@ -20,8 +20,8 @@ double odometryTotal =0;
     static double scale = 1;
     Space2D space2D;
     Simulation simulation;
-    MovementState movementState = MovementState.STILL;
-String agentName;
+  public MovementState movementState = MovementState.STILL;
+public String agentName;
     static int agentNumber = 0;
     static double nominalSpeed = 3; //px per iteration
     static double nominalAngularSpeed = 6 * Math.PI / 180; //rad per iteration
