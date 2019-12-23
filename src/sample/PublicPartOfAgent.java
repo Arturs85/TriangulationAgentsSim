@@ -2,31 +2,39 @@ package sample;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class PublicPartOfAgent {
     double x = 92;
-    double y = 50;
+    double y = 120;
+  public   int battLevel = 97;//
     float targetX;
     float targetY;
     float targetDirection;
     double odometryTotal = 0;
-
+Particle ownRelativePosition;
     static final int radius = 10;
     Canvas canvas;
-    double direction;
+  public   double direction;
     double moveDistanceRemaining = 0; // for seperate moves e.g. moveForward
+    double angleRemaining = 0; // for seperate moves e.g. turnRight
+
     static double scale = 1;
     Space2D space2D;
-    Simulation simulation;
+    public Simulation simulation;
     public MovementState movementState = MovementState.STILL;
-    public MovementMode movementMode = MovementMode.MANUAL;//default
+    public volatile MovementMode movementMode = MovementMode.MANUAL;//default
 
     public String agentName;
     public int agentNumber;
     static int agentNumberCounter = 0;
-    static double nominalSpeed = 3; //px per iteration
-    static double nominalAngularSpeed = 6 * Math.PI / 180; //rad per iteration
+    static double nominalSpeed = 10; //px per iteration
+    static double nominalAngularSpeed = 40 * Math.PI / 180; //rad per iteration
+
+    public double angleToOtherRobot = 0;
+    double otherRobotLineDistance = 100;//for drawing
 
     PublicPartOfAgent(Space2D space2D, Simulation simulation) {
         this.space2D = space2D;
@@ -34,6 +42,7 @@ public class PublicPartOfAgent {
         canvas = Main.canvas;
         agentNumber = generateAgentNumber();
         agentName = "UWBAgent " + agentNumber;
+    ownRelativePosition=new Particle(0,0,0);
     }
 
     //kārtas skaits ievietošanai jaunā aģenta vārdā
@@ -45,7 +54,7 @@ public class PublicPartOfAgent {
         direction += rad;
     }
 
-    void moveForward(int dist) {
+    void moveForward(double dist) {
         double xNew = x + dist * Math.cos(direction);
         double yNew = y + dist * Math.sin(direction);
 
@@ -70,21 +79,28 @@ public class PublicPartOfAgent {
 
     /**
      * changes movement mode to to_target so that robot keeps moving at its speed every iteration until
+     *
      * @param distance is reached
      */
-  public   void moveForwardBy(double distance) {
+    public void moveForwardBy(double distance) {
         movementMode = MovementMode.TO_TARGET;
         moveDistanceRemaining = distance;
+    }
+
+    public void turnRightBy(double angleRadians) {
+        movementMode = MovementMode.TO_ANGLE;
+        angleRemaining = Math.abs( angleRadians);
+
     }
 
     void manualMovementStep() {
 
         if (movementState.equals(MovementState.FORWARD)) {
-            moveForward((int) nominalSpeed);
+            moveForward( nominalSpeed);
         } else if (movementState.equals(MovementState.TURNING_LEFT)) {
             turn(-nominalAngularSpeed);
         } else if (movementState.equals(MovementState.TURNING_RIGHT)) {
-            turn(+nominalAngularSpeed);
+            turn(nominalAngularSpeed);
         }
 
     }
@@ -92,11 +108,17 @@ public class PublicPartOfAgent {
     void movementStep() {
 
         if (movementMode.equals(MovementMode.TO_TARGET)) {
-            moveForward((int) nominalSpeed);
+            moveForward(nominalSpeed);
             moveDistanceRemaining -= nominalSpeed;
             if (moveDistanceRemaining <= 0) {
                 movementMode = MovementMode.MANUAL;// target distance reached -> switch off to target mode
             }
+        } else if (movementMode.equals(MovementMode.TO_ANGLE)) {
+            turn(+nominalAngularSpeed);
+            angleRemaining-=nominalAngularSpeed;
+            if (angleRemaining < nominalAngularSpeed*2)
+                movementMode = MovementMode.MANUAL;// target distance reached -> switch off to target mode
+
         } else if (movementMode.equals(MovementMode.MANUAL)) {//
             manualMovementStep();
 
@@ -129,15 +151,28 @@ public class PublicPartOfAgent {
     public double calculateRelativeAngle(double mes1, double mes2, double odoDist) {
         if ((mes2 + odoDist) < mes1) return 0;
         if ((mes1 + odoDist) < mes2) return Math.PI;
+
         double angle = Math.acos((odoDist * odoDist + mes2 * mes2 - mes1 * mes1) / (2 * odoDist * mes2));
         return Math.PI - angle;
+    }
+    public static double  calcThirdSide(double a,double b,double angleRad){
+return Math.sqrt(a*a+b*b-2*a*b*Math.cos(angleRad));
     }
 
     void draw() {
         GraphicsContext g = canvas.getGraphicsContext2D();
+        g.setStroke(Color.BLACK);
+
         g.strokeOval(Space2D.cellsOffset + (x - radius) * scale, Space2D.cellsOffset + (y - radius) * scale, radius * 2 * scale, radius * 2 * scale);
         g.strokeLine(Space2D.cellsOffset + x * scale, Space2D.cellsOffset + y * scale, Space2D.cellsOffset + scale * (x + radius * Math.cos(direction)), Space2D.cellsOffset + scale * (y + radius * Math.sin(direction)));
         g.strokeText(String.valueOf(odometryTotal), Space2D.cellsOffset + x * scale, Space2D.cellsOffset + (y - radius) * scale);
+
+        if (angleToOtherRobot != 0) {//needs beter test- 0 can be valid angle
+            g.setStroke(Color.GREEN);
+            g.strokeLine(Space2D.cellsOffset + x * scale, Space2D.cellsOffset + y * scale, Space2D.cellsOffset + scale * (x + otherRobotLineDistance * Math.cos(angleToOtherRobot+direction)), Space2D.cellsOffset + scale * (y + otherRobotLineDistance * Math.sin(angleToOtherRobot+direction)));
+            g.strokeLine(Space2D.cellsOffset + x * scale, Space2D.cellsOffset + y * scale, Space2D.cellsOffset + scale * (x + otherRobotLineDistance * Math.cos(-angleToOtherRobot+direction)), Space2D.cellsOffset + scale * (y + otherRobotLineDistance * Math.sin(-angleToOtherRobot+direction)));
+
+        }
     }
 
     boolean hasHitObstacle(double x, double y) {

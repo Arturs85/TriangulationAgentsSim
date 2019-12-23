@@ -1,6 +1,8 @@
 package sample;
 
+import javafx.animation.Animation;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,7 +18,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-    Space2D board = new Space2D(400, 300);
+    Space2D board = new Space2D(500, 500);
     PublicPartOfAgent testAgent;
     Simulation simulation = new Simulation(board);
 boolean obstDrawingStarted = false;
@@ -32,13 +34,15 @@ static Canvas canvas = new Canvas(2500, 2500);
         board.draw(canvas);
         testAgent = simulation.createAgent();
          simulation.createAgent();
+        simulation.createAgent();
+
         //simulation.agents.add(testAgent);
         // PASimulator simulator = new PASimulator(board);
         // PolicyIterator policyIterator = new PolicyIterator(board);
         Button obstButton = new Button("Set Obstacle");
         Button terminalPositionButton = new Button("Set Terminal");
         Button startPositionButton = new Button("Set Start Position");
-        Button iterationButton = new Button("Run PI Algorithm");
+        Button iterationButton = new Button("Pause");
         Button makeMoveButton = new Button("Move");
         Button stopMoveButton = new Button("Stop");
 
@@ -99,13 +103,13 @@ stopMoveButton.setOnAction(event -> {
 
 
         iterationButton.setOnAction(event -> {
-            long start = System.nanoTime();
-            //   int itCount = policyIterator.runPolicyIterations();
-            long end = System.nanoTime();
-            end = end - start;
-            // System.out.println("No of iterations: " + itCount + " time: " + end + " ns");
-            //policyIterator.iteration();
-            board.draw(canvas);
+          if(simulation.timeline.getStatus().equals(Animation.Status.RUNNING)) {
+              simulation.timeline.pause();
+          iterationButton.setText("Run");
+          }else{
+              simulation.timeline.play();
+              iterationButton.setText("Pause");
+          }
 
         });
         makeMoveButton.setOnAction(event -> {
@@ -172,8 +176,12 @@ testAgent.movementState = MovementState.FORWARD;
         root.setRight(buttonBar);
 
 
-        primaryStage.setTitle("Particle localisation");
-        primaryStage.setScene(new Scene(root, 650, 575));
+        primaryStage.setTitle("Triangulation agents");
+        primaryStage.setScene(new Scene(root, 1000, 575));
+        primaryStage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
         primaryStage.show();
     }
 

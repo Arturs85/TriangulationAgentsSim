@@ -25,7 +25,7 @@ public class Simulation {
     ContainerController cc;
     AID[] topics = new AID[5];
     private final int SIM_TIME_LIMIT=2001;
-List<PublicPartOfAgent> publicPartsOfAgents = new ArrayList<>();
+public List<PublicPartOfAgent> publicPartsOfAgents = new ArrayList<>();
 
 
 //public List<PublicPartOfAgent> agents=new ArrayList<>(10);
@@ -36,6 +36,7 @@ List<PublicPartOfAgent> publicPartsOfAgents = new ArrayList<>();
         timeline = new Timeline(new KeyFrame(Duration.millis(simStepDefDuration), ae -> simulationStep()));
         timeline.setCycleCount(Animation.INDEFINITE);
     timeline.play();
+
     }
 
     synchronized void simulationStep() {
