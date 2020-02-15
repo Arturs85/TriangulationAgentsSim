@@ -1,27 +1,34 @@
 package sample;
 
+import jade.core.AID;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import sample.Behaviours.BaseTopicBasedTickerBehaviour;
+import sample.Behaviours.ExplorerPositionMsg;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PublicPartOfAgent {
-    double x = 92;
-    double y = 120;
+    public double x = 92;
+    public double y = 120;
   public   int battLevel = 97;//
     float targetX;
     float targetY;
     float targetDirection;
-    double odometryTotal = 0;
+  public   double odometryTotal = 0;
 Particle ownRelativePosition;
-    static final int radius = 10;
-    Canvas canvas;
+    public static final int radius = 10;
+    public Canvas canvas;
   public   double direction;
     double moveDistanceRemaining = 0; // for seperate moves e.g. moveForward
     double angleRemaining = 0; // for seperate moves e.g. turnRight
 
-    static double scale = 1;
+    public static double scale = 1;
     Space2D space2D;
     public Simulation simulation;
     public MovementState movementState = MovementState.STILL;
@@ -30,11 +37,13 @@ Particle ownRelativePosition;
     public String agentName;
     public int agentNumber;
     static int agentNumberCounter = 0;
-    static double nominalSpeed = 10; //px per iteration
-    static double nominalAngularSpeed = 40 * Math.PI / 180; //rad per iteration
+    static double nominalSpeed = 1; //px per iteration
+    static double nominalAngularSpeed = 1 * Math.PI / 180; //rad per iteration
 
     public double angleToOtherRobot = 0;
+    public Double angleToSecond =null;
     double otherRobotLineDistance = 100;//for drawing
+BaseUWBAgent owner;
 
     PublicPartOfAgent(Space2D space2D, Simulation simulation) {
         this.space2D = space2D;
@@ -126,13 +135,14 @@ Particle ownRelativePosition;
 
     }
 
-    public double measureDistance(String otherAgentName) throws Exception {
+    public double measureDistance(String otherAgentName){// throws Exception {
         for (PublicPartOfAgent ppa : simulation.publicPartsOfAgents) {
             if (otherAgentName.contains(ppa.agentName)) {
                 return measureDistance(ppa);
             }
         }
-        throw new Exception("No agent with given name found");
+        //throw new Exception("No agent with given name found");
+    return 0;
     }
 
     public double measureDistance(PublicPartOfAgent otherAgent) {
@@ -158,6 +168,10 @@ Particle ownRelativePosition;
     public static double  calcThirdSide(double a,double b,double angleRad){
 return Math.sqrt(a*a+b*b-2*a*b*Math.cos(angleRad));
     }
+//returns angle oposite to c
+    public static double  calcAngle(double a,double b,double c){//cos theorem
+        return Math.acos((a*a+b*b-c*c)/(2*a*b));
+    }
 
     void draw() {
         GraphicsContext g = canvas.getGraphicsContext2D();
@@ -173,6 +187,22 @@ return Math.sqrt(a*a+b*b-2*a*b*Math.cos(angleRad));
             g.strokeLine(Space2D.cellsOffset + x * scale, Space2D.cellsOffset + y * scale, Space2D.cellsOffset + scale * (x + otherRobotLineDistance * Math.cos(-angleToOtherRobot+direction)), Space2D.cellsOffset + scale * (y + otherRobotLineDistance * Math.sin(-angleToOtherRobot+direction)));
 
         }
+        if(angleToSecond!=null){
+            g.strokeLine(Space2D.cellsOffset + x * scale, Space2D.cellsOffset + y * scale, Space2D.cellsOffset + scale * (x + otherRobotLineDistance * Math.cos(angleToSecond+direction)), Space2D.cellsOffset + scale * (y + otherRobotLineDistance * Math.sin(angleToSecond+direction)));
+
+        }
+int rowHeight = 20;
+        ArrayList<BaseTopicBasedTickerBehaviour> b= new ArrayList<>(owner.behaviours);
+        StringBuilder sb=new StringBuilder();
+
+        for (int i = 0; i < b.size(); i++) {
+
+ sb.append(b.get(i).shortName);
+ sb .append(" ");
+
+        }
+        g.strokeText(sb.toString(), Space2D.cellsOffset + owner.publicPartOfAgent.x * scale+rowHeight, Space2D.cellsOffset + (owner.publicPartOfAgent.y - owner.publicPartOfAgent.radius + rowHeight) * scale);
+
     }
 
     boolean hasHitObstacle(double x, double y) {

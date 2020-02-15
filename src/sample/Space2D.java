@@ -14,7 +14,7 @@ public class Space2D {
     int height;
     int maxSize = 100;
 
-    static int cellsOffset = 10;
+    public static int cellsOffset = 10;
     int startPositionCount = 0;
     int terminalCount = 0;
     Canvas canvas;

@@ -1,11 +1,19 @@
 package sample.Behaviours;
 
+import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
+import javafx.application.Platform;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import sample.BaseUWBAgent;
+import sample.Space2D;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
+import static sample.PublicPartOfAgent.scale;
 
 public class BaseCommandListeningBehaviour extends BaseTopicBasedTickerBehaviour{
 MessageTemplate assignRoleTpl = MessageTemplate.MatchOntology(UWBOntologies.carryOutBeaconRole.name());
@@ -14,6 +22,7 @@ MessageTemplate assignRoleTpl = MessageTemplate.MatchOntology(UWBOntologies.carr
         super(a);
         createAndRegisterReceivingTopics(TopicNames.grandMasterToAll);
 createSendingTopic(TopicNames.potentialBeaconsToGMaster);
+   shortName = "BCLB";
     }
 
 
@@ -21,6 +30,7 @@ createSendingTopic(TopicNames.potentialBeaconsToGMaster);
     protected void onTick() {
         processBaseMessages();
         receiveBehaviourChangeRequest();
+   // draw();
     }
 
     void processBaseMessages() {// messages from  master- orders to change role
@@ -53,7 +63,7 @@ createSendingTopic(TopicNames.potentialBeaconsToGMaster);
             }
             if (hierarchyLevel == 0 ) {//0 means master
 
-                owner.addBehaviour(new BeaconsMasterBehaviour(owner));
+                owner.addBehaviour(new TwoPointParalelFormationRequest(owner));
             }else if(hierarchyLevel==1){
                 owner.addBehaviour(new TwoPointFormationRequest(owner));
             }else if(hierarchyLevel==2){
@@ -72,7 +82,28 @@ createSendingTopic(TopicNames.potentialBeaconsToGMaster);
             e.printStackTrace();
         }
         msg.addReceiver(sendingTopics[TopicNames.potentialBeaconsToGMaster.ordinal()]);
-        System.out.println("--sent bat level to topic pbtgm--");
+     //   System.out.println("--sent bat level to topic pbtgm--");
         owner.send(msg);
+    }
+
+    void draw() {
+        Platform.runLater(new Runnable() {
+                              @Override
+                              public void run() {
+                                  GraphicsContext g = owner.publicPartOfAgent.canvas.getGraphicsContext2D();
+                                  g.setStroke(Color.BLACK);
+                                  int rowHeight=20;
+                                  ArrayList<BaseTopicBasedTickerBehaviour>  b= new ArrayList<>(owner.behaviours);
+                                  for (int i = 0; i < b.size(); i++) {
+
+
+                                      g.strokeText(String.valueOf(b.get(i).shortName+" "), Space2D.cellsOffset + owner.publicPartOfAgent.x * scale, Space2D.cellsOffset + (owner.publicPartOfAgent.y - owner.publicPartOfAgent.radius + rowHeight) * scale);
+
+                                  }
+
+                              }
+                          }
+        );
+
     }
 }

@@ -1,7 +1,12 @@
 package sample.Behaviours;
 
 public enum TopicNames {
-    beaconToBeaconMasterTopic,
+    beaconFormationToBeaconMasterTopic,
     grandMasterToAll,
-    potentialBeaconsToGMaster
+    potentialBeaconsToGMaster,
+    twoPointFormation,
+    explorerToBeacons,
+    beaconsToBeaconsMaster,
+    bmToGm,
+    explorerToGM,
 }

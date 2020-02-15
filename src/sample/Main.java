@@ -35,6 +35,8 @@ static Canvas canvas = new Canvas(2500, 2500);
         testAgent = simulation.createAgent();
          simulation.createAgent();
         simulation.createAgent();
+        simulation.createAgent();
+        simulation.createAgent();
 
         //simulation.agents.add(testAgent);
         // PASimulator simulator = new PASimulator(board);

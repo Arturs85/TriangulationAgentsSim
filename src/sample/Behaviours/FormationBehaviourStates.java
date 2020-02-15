@@ -1,0 +1,16 @@
+package sample.Behaviours;
+
+public enum FormationBehaviourStates {
+   STARTUP,
+    WAITING_REPLAY,
+    FIRST_MOVE,
+    TURN_DEGREES,
+    SECOND_MOVE,
+    FINAL_POSITION_TURN,
+    FINAL_POSITION_MOVE,
+    IDLE,
+    WAITING_REQUEST,
+ WAITING_BEAC_MASTER_REQUEST,
+ WAITING_READY_MSG,
+
+}

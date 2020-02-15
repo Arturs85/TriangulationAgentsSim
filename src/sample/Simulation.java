@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Simulation {
     public Controller controller;
-    int simStepDefDuration = 50;
+    int simStepDefDuration = 20;//50
     Space2D board;
     int simTimeFactor = 1;
     Timeline timeline;

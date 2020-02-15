@@ -14,7 +14,7 @@ public abstract class BaseTopicBasedTickerBehaviour extends TickerBehaviour {
     public AID[] sendingTopics;
     public AID[] receivingTopics;
     public MessageTemplate[] templates;// for receiving  messages  of particular topic
-
+public String shortName;
     void createSendingTopic(TopicNames topicName) {
         sendingTopics[topicName.ordinal()] = owner.createTopicForBehaviour(topicName.name());
     }

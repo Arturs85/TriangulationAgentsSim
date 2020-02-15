@@ -22,7 +22,7 @@ public class BaseUWBAgent extends Agent {
     public MessageTemplate requestTamplate;
     public MessageTemplate informTamplate;
     public MessageTemplate agreeTemplate;
-public Set<Behaviour> behaviours=  new TreeSet<>(new BehavioursComparator());
+public Set<BaseTopicBasedTickerBehaviour> behaviours=  new TreeSet<>(new BehavioursComparator());
     public static final int tickerPeriod = 50;//ms
 public static String conversationAssignRole= "assignRole";//for Conversation ID
 
@@ -31,7 +31,7 @@ public static String conversationAssignRole= "assignRole";//for Conversation ID
         super.setup();
         Object args[] = getArguments();
         publicPartOfAgent = (PublicPartOfAgent) args[0];
-
+publicPartOfAgent.owner=this;
         try {
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
             requestTamplate = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
@@ -44,20 +44,22 @@ public static String conversationAssignRole= "assignRole";//for Conversation ID
 
         //      addBehaviour(new RandomRoamingBehaviour(this, tickerPeriod));
         if (publicPartOfAgent.agentNumber == 2) {
-            addBehaviour(new TwoPointFormationRequest(this));
-            publicPartOfAgent.y += 20;
-            publicPartOfAgent.x += 220;
+           // addBehaviour(new TwoPointFormationRequest(this));
+            publicPartOfAgent.y += 80;
+            publicPartOfAgent.x += 40;
 
         } else if (publicPartOfAgent.agentNumber == 1){
-            addBehaviour(new TwoPointFormationResponderBehaviour(this));
+         //   addBehaviour(new TwoPointFormationResponderBehaviour(this));
             addBehaviour(new GrandMasterBehaviour(this));
     }else if (publicPartOfAgent.agentNumber == 3){
-            addBehaviour(new BeaconsMasterBehaviour(this));
+           // addBehaviour(new TwoPointParalelFormationRequest(this));
             publicPartOfAgent.y += 250;
             publicPartOfAgent.x += 100;
 
         }
+
 addBehaviour(new BaseCommandListeningBehaviour(this));
+  addBehaviour(new ExplorerBehaviour(this));
     }
 
     public AID createTopicForBehaviour(String name) {
@@ -85,20 +87,21 @@ addBehaviour(new BaseCommandListeningBehaviour(this));
         if((!(behaviour.getClass().getName().equals(BaseCommandListeningBehaviour.class.getName()))) && (!(behaviour.getClass().getName().equals(GrandMasterBehaviour.class.getName())))){//remove conflicting  behaviours
             ArrayList<Behaviour> blist  = new ArrayList<>(behaviours);
     for (Behaviour b:blist ) {
-        if(b.getClass().getName().equals(PathFinderBehaviour.class.getName())||
-                b.getClass().getName().equals(BeaconsMasterBehaviour.class.getName())||
+        if(b.getClass().getName().equals(ExplorerBehaviour.class.getName())||
+               // b.getClass().getName().equals(BeaconsMasterBehaviour.class.getName())||
                 b.getClass().getName().equals(TwoPointFormationResponderBehaviour.class.getName())||
                 b.getClass().getName().equals(TwoPointFormationRequest.class.getName())
                 ){
 
-            behaviours.remove(b);
+           // behaviours.remove(b);
+            removeBehaviour(b);
             System.out.println(getName()+" removed behaviour: "+b.getBehaviourName());
         }
 
     }
 
 }
-      boolean  success=  behaviours.add(behaviour);
+      boolean  success=  behaviours.add((BaseTopicBasedTickerBehaviour) behaviour);
 if(success) {
     super.addBehaviour(behaviour);
     System.out.println(getName()+" added behaviour: "+behaviour.getBehaviourName());
